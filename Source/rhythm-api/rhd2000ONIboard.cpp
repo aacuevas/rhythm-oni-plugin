@@ -103,6 +103,7 @@ void Rhd2000ONIBoard::initialize()
     for (i = 1; i < MAX_NUM_DATA_STREAMS; i++) {
         enableDataStream(i, false);
     }
+    enableOtherDevices();
     updateStreamBlockSize();
 
     clearTtlOut();
@@ -413,7 +414,7 @@ void Rhd2000ONIBoard::uploadCommandList(const std::vector<int>& commandList, Aux
 // (PortA, PortB, PortC, or PortD) on the FPGA.
 void Rhd2000ONIBoard::selectAuxCommandBank(BoardPort port, AuxCmdSlot auxCommandSlot, int bank)
 {
-    int bitShift;
+    int bitShift = 0;
 
     if (auxCommandSlot != AuxCmd1 && auxCommandSlot != AuxCmd2 && auxCommandSlot != AuxCmd3) {
         std::cerr << "Error in Rhd2000ONIBoard::selectAuxCommandBank: auxCommandSlot out of range." << std::endl;
@@ -913,7 +914,7 @@ int Rhd2000ONIBoard::oni_write_reg_mask(const oni_ctx ctx, oni_dev_idx_t dev_idx
 }
 
 
-int Rhd2000ONIBoard::readFrame(oni_frame_t** frame)
+int Rhd2000ONIBoard::readFrame(oni_frame_t** frame, bool filterRhythm)
 {
     int res;
     bool found = false;
@@ -921,7 +922,7 @@ int Rhd2000ONIBoard::readFrame(oni_frame_t** frame)
     {
         res = oni_read_frame(ctx, frame);
         if (res < ONI_ESUCCESS) return res;
-        if ((*frame)->dev_idx == DEVICE_RHYTHM)
+        if (filterRhythm == false ||  (*frame)->dev_idx == DEVICE_RHYTHM)
         {
             found = true;
         }
@@ -1077,4 +1078,21 @@ Rhd2000ONIBoard::BoardMemState Rhd2000ONIBoard::getBoardMemState() const
     oni_reg_val_t val;
     if (oni_read_reg(ctx, 254, 0x1000, &val) != ONI_ESUCCESS) return BOARDMEM_INVALID;
     return static_cast<BoardMemState>(val & 0x03);
+}
+
+void Rhd2000ONIBoard::enableOtherDevices()
+{
+    oni_write_reg(ctx, DEVICE_MEMORY, 0, 1);
+    oni_write_reg(ctx, DEVICE_MEMORY, 1, 50e6/100);
+    oni_write_reg(ctx, DEVICE_BNO, 0, 1);
+}
+
+//BNODBG
+int Rhd2000ONIBoard::getBNOEnabled()
+{
+    oni_reg_val_t val;
+    int res;
+    res = oni_read_reg(ctx, DEVICE_BNO, 0, &val);
+    if (res != ONI_ESUCCESS) return res;
+    return val;
 }

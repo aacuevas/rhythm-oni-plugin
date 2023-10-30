@@ -107,6 +107,9 @@ namespace ONIRhythmNode
 		ScopedPointer<UtilityButton> dspoffsetButton;
 		ScopedPointer<ComboBox> ttlSettleCombo, dacHPFcombo;
 
+		//BNODBG
+		ScopedPointer<ComboBox> debugCombo;
+
 		ScopedPointer<Label> audioLabel, ttlSettleLabel, dacHPFlabel;
 
 		bool saveImpedances, measureWhenRecording;

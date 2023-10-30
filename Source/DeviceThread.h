@@ -237,6 +237,9 @@ namespace ONIRhythmNode
 		int MAX_NUM_HEADSTAGES;
 		int MAX_NUM_DATA_STREAMS;
 
+		//BNODBG
+		void setBnoDbgLevel(int);
+
 	private:
 		bool varSampleRateCapable = false;
 
@@ -371,6 +374,9 @@ namespace ONIRhythmNode
 		CriticalSection oniLock;
 
 		int regOffset;
+
+		//BNODBG
+		int bnoDbgLevel = 1;
 
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DeviceThread);
 	};

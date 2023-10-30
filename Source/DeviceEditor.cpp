@@ -41,8 +41,19 @@ inline double round(double x)
 
 DeviceEditor::DeviceEditor(GenericProcessor* parentNode,
                              DeviceThread* board_)
-    : VisualizerEditor(parentNode, "tabText", 340), board(board_)
+   // : VisualizerEditor(parentNode, "tabText", 340), board(board_)
+    : VisualizerEditor(parentNode, "tabText", 460), board(board_)
 {
+    //BNODBG
+    debugCombo = new ComboBox();
+    debugCombo->setBounds(340, 40, 100, 20);
+    debugCombo->addItem("No dbg", 1);
+    debugCombo->addItem("dbg bno", 2);
+    debugCombo->addItem("dbg all", 3);
+    debugCombo->setSelectedId(1, dontSendNotification);
+    debugCombo->addListener(this);
+    addAndMakeVisible(debugCombo);
+
     canvas = nullptr;
 
    tabText = "ONI Acq Board";
@@ -255,6 +266,11 @@ void DeviceEditor::comboBoxChanged(ComboBox* comboBox)
             int HPFvalues[10] = {50,100,200,300,400,500,600,700,800,900};
             board->setDAChpf(HPFvalues[selection-2],true);
         }
+    }
+    //BNODBG
+    else if (comboBox == debugCombo)
+    {
+        board->setBnoDbgLevel(comboBox->getSelectedId());
     }
 }
 
